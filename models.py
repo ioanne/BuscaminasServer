@@ -1,5 +1,7 @@
 from flask import flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_marshmallow import Marshmallow
+from marshmallow import Schema, fields
 
 
 app = Flask(__name__)
@@ -7,6 +9,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/buscaminas.db'
 
 db = SQLAlchemy(app)
 
+ma = Marshmallow(app)
 
 class Tablero(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -42,3 +45,24 @@ class Celda(db.Model):
     
     fila = db.relationship('Fila', back_populates='celdas')
     tablero = db.relationship('Tablero', back_populates='celdas')
+
+
+class CeldaSchema(ma.Schema):
+    id_fila = fields.Int()
+    nro_celda = fields.Int()
+    estado = fields.Int()
+    contenido = fields.Int()
+    bandera = fields.Bool()
+    id_tablero = fields.Int()
+
+
+class FilaSchema(ma.Schema):
+    id_tablero = fields.Int()
+    nro_fila = fields.Int()
+    celdas = fields.List(fields.Nested(CeldaSchema))
+
+
+fila_schema = FilaSchema()
+celda_schema = CeldaSchema()
+filas_schema = FilaSchema(many=True)
+celdas_schema = CeldaSchema(many=True)

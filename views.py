@@ -31,6 +31,7 @@ class GenerarTablero(Resource):
                     tablero_form.celdas_y.data,
                     tablero_form.celdas_y.data
             )
+
         
         return jsonify({'Mensaje': 'Se creo tablero.'})
 
