@@ -3,7 +3,7 @@ from flask_restful import Resource, Api
 import json
 import forms as form
 from logica_buscaminas import generar_tablero
-from models import Tablero, filas_schema, celdas_schema, db, Celda, Fila
+from models import Tablero, Fila, filas_schema, celdas_schema, db, Celda, Fila
 
 app = Flask(__name__)
 api = Api(app)
@@ -68,10 +68,10 @@ class GenerarTablero(Resource):
 class ObtenerTablero(Resource):
     def get(self, id_partida):
         tablero = Tablero.query.filter_by(id_partida=id_partida).first()
-
-        if tablero:
-            tablero_json = filas_schema.dump(tablero.filas).data
-            return {'Tablero': tablero_json}
+        filas = Fila.query.filter_by(id_tablero=tablero.id).order_by(Fila.nro_fila.desc()).all()
+        if filas:
+            tablero_json = filas_schema.dump(filas).data
+            return {'Filas': tablero_json}
         else:
             return {'Mensaje': 'Error'}
 
