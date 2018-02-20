@@ -2,14 +2,20 @@ from flask import flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from marshmallow import Schema, fields
+from flask_migrate import Migrate, MigrateCommand
 
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/buscaminas.db'
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
+
+manager = Manager(app)
+manager.add_command('db', MigrateCommand)
 
 ma = Marshmallow(app)
+
 
 class Tablero(db.Model):
     id = db.Column(db.Integer, primary_key=True, unique=True)
@@ -23,6 +29,12 @@ class Tablero(db.Model):
 
     filas = db.relationship('Fila', back_populates='tablero')
     celdas = db.relationship('Celda', back_populates='tablero')
+
+    def get_by_id_partida(id_partida):
+        tablero = Tablero.query.filter_by(
+            id_partida=id_partida).first()
+
+        return tablero
 
 
 class Fila(db.Model):
@@ -66,3 +78,7 @@ fila_schema = FilaSchema()
 celda_schema = CeldaSchema()
 filas_schema = FilaSchema(many=True)
 celdas_schema = CeldaSchema(many=True)
+
+
+if __name__ == '__main__':
+    manager.run()

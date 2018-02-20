@@ -3,6 +3,7 @@ from flask_restful import Resource, Api
 import json
 import forms as form
 from logica_buscaminas import generar_tablero
+from models import Tablero, filas_schema, celdas_schema 
 
 app = Flask(__name__)
 api = Api(app)
@@ -16,6 +17,7 @@ def obtener_datos_tablero():
 
     return buscaminas_form
 
+
 class GenerarTablero(Resource):
     def put(self, id_partida):
         '''
@@ -25,6 +27,7 @@ class GenerarTablero(Resource):
         tablero_form = obtener_datos_tablero()
 
         if tablero_form.validate():
+            # Retornamos las filas con las columnas.
             filas = generar_tablero(
                     id_partida,
                     tablero_form.cantidad_minas.data,
@@ -32,8 +35,14 @@ class GenerarTablero(Resource):
                     tablero_form.celdas_y.data
             )
 
-        
-        return jsonify({'Mensaje': 'Se creo tablero.'})
+        if filas:
+            filas = filas_schema.dump(filas).data
+            
+            return jsonify({'Filas': filas })
+
+        else:
+            return jsonify({'Mensaje': 'Error.'})
+
 
 api.add_resource(GenerarTablero, '/partida/<int:id_partida>/generar_tablero')
 

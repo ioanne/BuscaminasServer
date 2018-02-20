@@ -6,8 +6,7 @@ def generar_tablero(
             celdas_x,
             celdas_y):
     
-    tablero = Tablero.query.filter_by(
-            id_partida=id_partida).first()
+    tablero = Tablero.get_by_id_partida(id_partida)
 
     if not tablero:
         tablero = Tablero(
@@ -25,8 +24,7 @@ def generar_tablero(
             db.session.add(fila)
             db.session.commit()
 
-        filas = Fila.query.filter_by(
-                        id_tablero=tablero.id).all()
+        
 
         return tablero
 
