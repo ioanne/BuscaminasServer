@@ -84,7 +84,14 @@ def revelar_casillero(tablero_id, x, y):
         tablero.casilleros_revelados += 1
 
         db.session.commit()
-        
+        casilla = coord_a_num(tablero.id, x, y)
+        casillas = get_casillas_al_rededor(casilla, tablero.id)
+        if casillas:
+            for c in casillas:
+                tablero.filas[c[1]].celdas[c[0]].estado = 1
+                tablero.casilleros_revelados += 1
+
+            db.session.commit()
         return True
 
 
@@ -96,3 +103,67 @@ def coord_a_num(id_tablero, x, y):
 def num_a_coord(id_tablero, numero):
     tablero = Tablero.query.filter_by(id=id_tablero).first()
     return (numero%tablero.cantidad_x, numero//tablero.cantidad_x)
+
+
+def get_casillas_al_rededor(casilla, tablero_id):
+    minas = get_minas(tablero_id)
+    tablero = Tablero.query.get(tablero_id)
+
+    x, y = num_a_coord(tablero_id, casilla)
+    casilleros_adyacentes = []
+    casilleros_minados = []
+    if x > 0:
+        casilleros_adyacentes.append(
+            num_a_coord(tablero_id, casilla - 1))
+
+        if y > 0:
+            casilleros_adyacentes.append(
+                num_a_coord(
+                    tablero_id, casilla - tablero.cantidad_x - 1))
+
+        if y < 0:
+            casilleros_adyacentes.append(
+                num_a_coord(
+                    tablero_id, casilla + tablero.cantidad_x - 1))
+
+    if x < tablero.cantidad_x - 1:
+        casilleros_adyacentes.append(
+            num_a_coord(tablero_id, casilla + 1))
+
+        if y > 0:
+            casilleros_adyacentes.append(
+                num_a_coord(
+                    tablero_id, casilla - tablero.cantidad_x + 1))
+
+        if y < tablero.cantidad_x - 1:
+            casilleros_adyacentes.append(
+                num_a_coord(
+                    tablero_id, casilla + tablero.cantidad_x + 1))
+
+    if y > 0:
+        casilleros_adyacentes.append(
+            num_a_coord(
+                tablero_id, casilla - tablero.cantidad_x))
+
+    if y < tablero.cantidad_x - 1:
+        casilleros_adyacentes.append(
+            num_a_coord(
+                tablero_id, casilla + tablero.cantidad_x))
+
+    casilleros_minados = [
+            casillero for casillero in casilleros_adyacentes \
+            for mina in minas if casillero == mina
+            ]
+
+    casilleros_no_minados = [
+            casillero for casillero in casilleros_adyacentes \
+            for mina in minas if casillero != mina
+                ]
+
+    if casilleros_minados:
+        set_casilleros_no_minados = set(casilleros_no_minados)
+        lista_casilleros_no_minados = list(set_casilleros_no_minados)
+        
+        return lista_casilleros_no_minados
+    else:
+        return None
