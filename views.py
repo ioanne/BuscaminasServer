@@ -81,4 +81,4 @@ api.add_resource(ObtenerTablero, '/partida/<int:id_partida>')
 api.add_resource(ChequearCasillero, '/partida/<int:id_partida>/chequear_casillero/x/<int:x>/y/<int:y>')
 
 if __name__ == '__main__':
-    app.run(debug=False, port=5555)
+    app.run(debug=True, port=5555)
