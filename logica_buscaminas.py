@@ -56,3 +56,43 @@ def generar_minas(cantidad, celdas_x, celdas_y):
         y = random.randint(0, celdas_y - 1)
         contenedor_minas.add((x,y))
     return contenedor_minas
+
+
+def get_minas(id_tablero):
+    minas = Celda.get_minas_en_celdas(id_tablero)
+    minas_list = []
+    
+    for mina in minas:
+        minas_list.append(
+            (mina.nro_celda, mina.fila.nro_fila))
+        return minas_list
+
+
+def revelar_casillero(tablero_id, x, y):
+    tablero = Tablero.query.get(tablero_id)
+
+    # Comienza en None, lo pongo en 0
+    if not tablero.casilleros_revelados:
+        tablero.casilleros_revelados = 0
+        db.session.commit()
+
+    if tablero.filas[y].celdas[x].contenido == 1:
+        tablero.game_over = True
+        return False
+    else:
+        tablero.filas[y].celdas[x].estado = 1
+        tablero.casilleros_revelados += 1
+
+        db.session.commit()
+        
+        return True
+
+
+def coord_a_num(id_tablero, x, y):
+    tablero = Tablero.query.filter_by(id=id_tablero).first()
+    return tablero.cantidad_x*y+x
+
+
+def num_a_coord(id_tablero, numero):
+    tablero = Tablero.query.filter_by(id=id_tablero).first()
+    return (numero%tablero.cantidad_x, numero//tablero.cantidad_x)

@@ -45,6 +45,12 @@ class Fila(db.Model):
     tablero = db.relationship('Tablero', back_populates='filas')
     celdas = db.relationship('Celda', back_populates='fila')
 
+    def get_by_id_tablero(id_tablero):
+        filas = Fila.query.filter_by(
+            id_tablero=id_tablero).order_by(
+            Fila.nro_fila).all()
+        return filas
+
 
 class Celda(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -57,6 +63,12 @@ class Celda(db.Model):
     
     fila = db.relationship('Fila', back_populates='celdas')
     tablero = db.relationship('Tablero', back_populates='celdas')
+
+    def get_minas_en_celdas(id_tablero):
+        minas = Celda.query.filter_by(
+            id_tablero=id_tablero).filter_by(
+            contenido=1).all()
+        return minas
 
 
 class CeldaSchema(ma.Schema):
