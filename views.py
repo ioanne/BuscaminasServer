@@ -3,7 +3,7 @@ from flask_restful import Resource, Api
 import json
 import forms as form
 from logica_buscaminas import generar_tablero
-from models import Tablero, filas_schema, celdas_schema 
+from models import Tablero, filas_schema, celdas_schema, db, Celda, Fila
 
 app = Flask(__name__)
 api = Api(app)
@@ -64,8 +64,20 @@ class GenerarTablero(Resource):
         else:
             return jsonify({'Mensaje': 'Error.'})
 
+
+class ObtenerTablero(Resource):
+    def get(self, id_partida):
+        tablero = Tablero.query.filter_by(id_partida=id_partida).first()
+
+        if tablero:
+            tablero_json = filas_schema.dump(tablero.filas).data
+            return {'Tablero': tablero_json}
+        else:
+            return {'Mensaje': 'Error'}
+
 api.add_resource(GenerarTablero, '/partida/<int:id_partida>/generar_tablero')
+api.add_resource(ObtenerTablero, '/partida/<int:id_partida>')
 api.add_resource(ChequearCasillero, '/partida/<int:id_partida>/chequear_casillero/x/<int:x>/y/<int:y>')
 
 if __name__ == '__main__':
-    app.run(debug=False)
+    app.run(debug=False, port=5555)

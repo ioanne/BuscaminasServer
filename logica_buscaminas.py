@@ -1,4 +1,4 @@
-from models import Tablero, Fila
+from models import Tablero, Fila, Celda, db
 import random
 
 
@@ -16,6 +16,9 @@ def generar_tablero(
             cantidad_x=celdas_x,
             cantidad_y=celdas_y,
             id_partida=id_partida)
+
+        db.session.add(tablero)
+        db.session.commit()
 
         for y in range(tablero.cantidad_y):
             fila = Fila(
