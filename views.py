@@ -2,7 +2,7 @@ from flask import Flask, jsonify, request
 from flask_restful import Resource, Api
 import json
 import forms as form
-from logica_buscaminas import generar_tablero
+from logica_buscaminas import generar_tablero, revelar_casillero
 from models import Tablero, Fila, filas_schema, celdas_schema, db, Celda, Fila
 
 app = Flask(__name__)
@@ -71,7 +71,7 @@ class ObtenerTablero(Resource):
         filas = Fila.query.filter_by(id_tablero=tablero.id).order_by(Fila.nro_fila.desc()).all()
         if filas:
             tablero_json = filas_schema.dump(filas).data
-            return {'Filas': tablero_json}
+            return {'Filas': tablero_json, 'Partida':id_partida}
         else:
             return {'Mensaje': 'Error'}
 
