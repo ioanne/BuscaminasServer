@@ -1,0 +1,44 @@
+from flask import flask
+from flask_sqlalchemy import SQLAlchemy
+
+
+app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:////tmp/buscaminas.db'
+
+db = SQLAlchemy(app)
+
+
+class Tablero(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    cantidad_minas = db.Column(db.Integer)
+    cantidad_x = db.Column(db.Integer)
+    cantidad_y = db.Column(db.Integer)
+    casilleros_revelados = db.Column(db.Integer)
+    estado = db.Column(db.Integer)
+    id_partida = db.Column(db.Integer, unique=True)
+    game_over = db.Column(db.Boolean, default=False)
+
+    filas = db.relationship('Fila', back_populates='tablero')
+    celdas = db.relationship('Celda', back_populates='tablero')
+
+
+class Fila(db.Model):
+    id = db.Column(db.Integer, primary_key=True, unique=True)
+    id_tablero = db.Column(db.Integer, db.ForeignKey('tablero.id'))
+    nro_fila = db.Column(db.Integer)
+
+    tablero = db.relationship('Tablero', back_populates='filas')
+    celdas = db.relationship('Celda', back_populates='fila')
+
+
+class Celda(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nro_celda = db.Column(db.Integer)
+    estado = db.Column(db.Integer)
+    contenido = db.Column(db.Integer)
+    bandera = db.Column(db.Boolean)
+    id_tablero = db.Column(db.Integer, db.ForeignKey('tablero.id'))
+    id_fila = db.Column(db.Integer, db.ForeignKey('fila.id'))
+    
+    fila = db.relationship('Fila', back_populates='celdas')
+    tablero = db.relationship('Tablero', back_populates='celdas')
