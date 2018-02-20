@@ -36,6 +36,7 @@ class ChequearCasillero(Resource):
                 tablero_json = filas_schema.dump(tablero.filas).data
                 return {'Tablero': tablero_json}
             else:
+                tablero.game_over = True
                 return {'Message': 'Game Over'}
 
 
@@ -71,7 +72,7 @@ class ObtenerTablero(Resource):
         filas = Fila.query.filter_by(id_tablero=tablero.id).order_by(Fila.nro_fila.desc()).all()
         if filas:
             tablero_json = filas_schema.dump(filas).data
-            return {'Filas': tablero_json, 'Partida':id_partida}
+            return {'Filas': tablero_json, 'Partida':id_partida, 'game_over': tablero.game_over}
         else:
             return {'Mensaje': 'Error'}
 
