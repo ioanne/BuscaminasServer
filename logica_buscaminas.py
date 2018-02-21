@@ -46,7 +46,7 @@ def generar_tablero(
 
         for mina in minas:
             filas[mina[0]].celdas[mina[1]].contenido = 1
-        db.session.commit()
+            db.session.commit()
         return filas
     else:
         return tablero
@@ -68,7 +68,7 @@ def get_minas(id_tablero):
     for mina in minas:
         minas_list.append(
             (mina.nro_celda, mina.fila.nro_fila))
-        return minas_list
+    return minas_list
 
 
 def revelar_casillero(tablero_id, x, y):
@@ -163,7 +163,7 @@ def get_casillas_al_rededor(casilla, tablero_id):
             for mina in minas if casillero != mina
                 ]
 
-    if casilleros_minados:
+    if not casilleros_minados:
         set_casilleros_no_minados = set(casilleros_no_minados)
         lista_casilleros_no_minados = list(set_casilleros_no_minados)
         
